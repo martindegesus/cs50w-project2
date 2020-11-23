@@ -1,0 +1,54 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{listing}}</h2> <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" name="add to watchlist" value="Submit" />
+
+    </form>
+    <div class="listing">
+        {% if not active %}
+            this listing is not active
+        {% endif %}
+        <li> <img src={{listing.image}} width="500" height="400" >
+        <li> Description: {{listing.description}}</li>
+        <li> Starting Bid: {{listing.startingbid}}</li>
+        <li> Highest bidder: {{listing.highestbid.user}}</li>
+        <li> Highest bid: {{listing.highestbid.price}}</li>
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{bidform}}
+            <label>Bid: {{minbid}} or above</label>
+            <input type="hidden" name="id" value={{listing.id}} />
+            <input type="hidden" name="minbid" value={{minbid}} />
+            <input type="submit" name="save_bid" value="Submit" />
+    
+        </form>
+        <li> Start date: {{listing.startDate}}</li>
+
+        {% if active %}
+        <div>
+            {% for comment in commentslist %}
+                <div class="comment">
+                    <li> {{comment.description}}</li>
+                    <li> {{comment.user}}</li>
+                    <li> {{comment.date}}</li>
+                </div>
+                {% endfor %}
+        </div>
+        {% endif %}
+        {% if active %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{commentForm}}
+                <input type="hidden" name="id" value={{listing.id}} />
+                <input type="submit" name="save_comment" value="Submit" />
+        
+            </form>
+        {% endif %}
+
+        
+
+
+    </div>
+{% endblock %}

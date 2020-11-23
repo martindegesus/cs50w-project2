@@ -1,0 +1,54 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for listing in listings %}
+        {% if listing.winner == listing.user %}
+        your listing reached its end date without any bids
+        <div class="listing">
+            <a href="{{listing.id}}" >{{listing.title}}</a>
+            <img src={{listing.image}} width="500" >
+            <li> Description: {{listing.description}}</li>
+            <li> Highest bid: {{listing.highestbid.price}}</li>
+            <li> Starting date: {{listing.startDate}}</li>
+            <li> End date: {{listing.endDate}}</li>
+        </div>
+        {% endif %}
+        {% if listing.winner == user %}
+        Congratulations, you won this listing:
+        <div class="listing">
+            <a href="{{listing.id}}" >{{listing.title}}</a>
+            <img src={{listing.image}} width="500" >
+            <li> Description: {{listing.description}}</li>
+            <li> Your bid: {{listing.highestbid.price}}</li>
+        </div>
+        {% endif %}
+    {% endfor %}
+    <h2>Active Listings</h2>
+    {% for listing in activelistings %}
+    <div class="listing">
+        <a href="{{listing.id}}" >{{listing.title}}</a>
+        {% if listing in watchlist.all %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="id" value={{listing.id}}>
+                <input type="submit" name="remove_watchlist" value="Remove from watchlist" />
+                
+            </form>
+        {% else %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="id" value={{listing.id}}>
+                <input type="submit" name="add_watchlist" value="Add to watchlist" />
+            </form>
+        {% endif %}
+        {% if listing.image != '' %}
+        <img src={{listing.image}} width="500" >
+        {% endif %}
+        <li> Description: {{listing.description}}</li>
+        <li> Highest bid: {{listing.highestbid.price}}</li>
+        <li> {{listing.startDate}}</li>
+    </div>
+    {% empty %}
+        <li>No active listings</li>
+    {% endfor %}
+{% endblock %}
