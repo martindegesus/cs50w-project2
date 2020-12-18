@@ -5,10 +5,10 @@
     <div>
         {% for category in categories %}
             <div class="category">
-                <li><a href=categories/{{category.id}}>{{category}} </a> </li>
+                <h3><li><a href=categories/{{category.id}}>{{category}} </a></li> </h3>
             </div>
         {% empty %}
-            <li>No active listings</li>
+           <h3> <li>There are no created categories to display</li></h3></li>
         {% endfor %}
     </div>
 {% endblock %}

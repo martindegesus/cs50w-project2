@@ -1,54 +1,73 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    {% for listing in listings %}
-        {% if listing.winner == listing.user %}
-        your listing reached its end date without any bids
-        <div class="listing">
-            <a href="{{listing.id}}" >{{listing.title}}</a>
-            <img src={{listing.image}} width="500" >
-            <li> Description: {{listing.description}}</li>
-            <li> Highest bid: {{listing.highestbid.price}}</li>
-            <li> Starting date: {{listing.startDate}}</li>
-            <li> End date: {{listing.endDate}}</li>
-        </div>
+    {% if user.is_authenticated %}
+        
+        <!-- displays watchlist -->
+        {% if renderingwatchlist == 'true' %}
+
+            {% for listing in listings %}
+
+            <div class="card" style="width: 36rem; margin-left: 5rem; margin-top: 2rem;" >
+                {% if listing.winner == user %}
+                <h5 class="card-header">Congratulations, you won this listing</h5>
+                {% else %}
+                    {% if listing.winner %}
+                        <h5 class="card-header">this listing is not active anymore</h5>
+                    {% endif %}
+                {% endif %}
+                {% if listing.image != '' %}
+                    <img src={{listing.image}} class="card-img-top" alt={{listing.title}}>
+                {% endif %}
+                <div class="card-body">
+                <h5 class="card-title">{{listing.title}}</h5>
+                <p class="card-text">Description: {{listing.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                {% if listing.category != '' %}
+                    <li class="list-group-item">Category: {{listing.category}}</li>
+                {% endif %}
+                <li class="list-group-item">Highest bid: {{listing.highestbid.price}}</li>
+                <li class="list-group-item">Start date: {{listing.startDate}}</li>
+                <li class="list-group-item">End date: {{listing.endDate}}</li>
+                </ul>
+                <div class="card-body">
+                <a href="{{listing.id}}" class="card-link">Visit this listing</a>
+                </div>
+            </div>
+
+            {% empty %}
+                <li>There are no auctions in your watchlist</li>
+            {% endfor %}
         {% endif %}
-        {% if listing.winner == user %}
-        Congratulations, you won this listing:
-        <div class="listing">
-            <a href="{{listing.id}}" >{{listing.title}}</a>
-            <img src={{listing.image}} width="500" >
-            <li> Description: {{listing.description}}</li>
-            <li> Your bid: {{listing.highestbid.price}}</li>
-        </div>
-        {% endif %}
-    {% endfor %}
-    <h2>Active Listings</h2>
-    {% for listing in activelistings %}
-    <div class="listing">
-        <a href="{{listing.id}}" >{{listing.title}}</a>
-        {% if listing in watchlist.all %}
-            <form action="" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="id" value={{listing.id}}>
-                <input type="submit" name="remove_watchlist" value="Remove from watchlist" />
-                
-            </form>
-        {% else %}
-            <form action="" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="id" value={{listing.id}}>
-                <input type="submit" name="add_watchlist" value="Add to watchlist" />
-            </form>
-        {% endif %}
-        {% if listing.image != '' %}
-        <img src={{listing.image}} width="500" >
-        {% endif %}
-        <li> Description: {{listing.description}}</li>
-        <li> Highest bid: {{listing.highestbid.price}}</li>
-        <li> {{listing.startDate}}</li>
-    </div>
-    {% empty %}
-        <li>No active listings</li>
-    {% endfor %}
+    {% endif %}
+    {% if renderingwatchlist != 'true' %}
+
+        <h2>Active Listings</h2>
+        {% for listing in activelistings %}
+            <div class="card" style="width: 36rem; margin-left: 5rem; margin-top: 2rem;" >
+                {% if listing.image != '' %}
+                    <img src={{listing.image}} class="card-img-top" alt={{listing.title}}>
+                {% endif %}
+                <div class="card-body">
+                <h5 class="card-title">{{listing.title}}</h5>
+                <p class="card-text">Description: {{listing.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                {% if listing.category != '' %}
+                    <li class="list-group-item">Category: {{listing.category}}</li>
+                {% endif %}
+                <li class="list-group-item">Highest bid: {{listing.highestbid.price}}</li>
+                <li class="list-group-item">Start date: {{listing.startDate}}</li>
+                <li class="list-group-item">End date: {{listing.endDate}}</li>
+                </ul>
+                <div class="card-body">
+                <a href="{{listing.id}}" class="card-link">Visit this listing</a>
+                </div>
+            </div>
+
+            {% empty %}
+                <li>There are no active listings</li>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

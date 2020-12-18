@@ -1,32 +1,53 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{listing}}</h2> <form action="" method="POST">
-        {% csrf_token %}
-        <input type="submit" name="add to watchlist" value="Submit" />
-
-    </form>
-    <div class="listing">
+    <h2>{{listing}}</h2> 
+    
+    <div class="card" style="width: 36rem; margin-left: 5rem; margin-top: 2rem;" >
         {% if not active %}
-            this listing is not active
+            {% if listing.highestbid.user == user %}
+                <h5 class="card-header">Congratulations, you won this listing</h5>
+            {% else %}
+                <h5 class="card-header">this listing is not active</h5>
+            {% endif %}
         {% endif %}
-        <li> <img src={{listing.image}} width="500" height="400" >
-        <li> Description: {{listing.description}}</li>
-        <li> Starting Bid: {{listing.startingbid}}</li>
-        <li> Highest bidder: {{listing.highestbid.user}}</li>
-        <li> Highest bid: {{listing.highestbid.price}}</li>
-        <form action="" method="POST">
+
+        
+
+        {% if listing.image != '' %}
+            <img src={{listing.image}} class="card-img-top" alt={{listing.title}}>
+        {% endif %}
+        <div class="card-body">
+        <p class="card-text">Description: {{listing.description}}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+        {% if listing.category != '' %}
+            <li class="list-group-item">Category: {{listing.category}}</li>
+        {% endif %}
+        <li class="list-group-item">Highest bid: {{listing.highestbid.price}}</li>
+        <li class="list-group-item"> Highest bidder: {{listing.highestbid.user}}</li>
+        <li class="list-group-item">Start date: {{listing.startDate}}</li>
+        <li class="list-group-item">End date: {{listing.endDate}}</li>
+        </ul>
+        <div class="card-body">
+        
+        
+        </div>
+        {% if active %}
+        {% if user.is_authenticated %}
+        <form action="" method="POST" style="width: 32rem; margin: 1rem;" >
             {% csrf_token %}
             {{bidform}}
             <label>Bid: {{minbid}} or above</label>
             <input type="hidden" name="id" value={{listing.id}} />
             <input type="hidden" name="minbid" value={{minbid}} />
-            <input type="submit" name="save_bid" value="Submit" />
+            <input class="btn btn-outline-primary"style="width: 16rem;" type="submit" name="save_bid" value="Bid" />
     
         </form>
-        <li> Start date: {{listing.startDate}}</li>
+        {% endif %}
+        {% endif %}
 
-        {% if active %}
+        <!-- display comments -->
         <div>
             {% for comment in commentslist %}
                 <div class="comment">
@@ -36,19 +57,49 @@
                 </div>
                 {% endfor %}
         </div>
-        {% endif %}
-        {% if active %}
-            <form action="" method="POST">
+                {% if user.is_authenticated %}
+                <form action="" method="POST" style="width: 32rem; margin-left: 1rem;" >
+                    {% csrf_token %}
+                    {{commentForm}}
+                    <input type="hidden" name="id" value={{listing.id}} />
+                    <input class="btn btn-outline-primary" style="width: 16rem; margin-top: 1rem;" type="submit" name="save_comment" value="Comment" />
+            
+                </form>
+                {% endif %}
+        <div style="width: 16rem; margin-top: 2rem;" >
+            <ul class="list-group list-group-flush">
+            {% if user.is_authenticated %}
+                {% if listing in watchlist.all %}
+                    <form action="" method="POST" >
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value={{listing.id}}>
+                        <li class="list-group-item" style="width: 35.9rem;">
+                        <input class="btn btn-outline-primary" style="width: 16rem; margin-top: 1rem; margin-left: 7rem; "  type="submit" name="remove_watchlist" value="Remove from watchlist" />
+                        </li>
+                    </form>
+                {% else %}
+                    <form action="" method="POST"  >
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value={{listing.id}}>
+                        <li class="list-group-item" style="width: 35rem;">
+                        <input class="btn btn-outline-primary" style="width: 16rem; margin-top: 1rem; margin-left: 7rem; " type="submit" name="add_watchlist" value="Add to watchlist" />
+                        </li>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            {% if user == listing.user and active%}
+
+            <form action="" method="POST"  >
                 {% csrf_token %}
-                {{commentForm}}
-                <input type="hidden" name="id" value={{listing.id}} />
-                <input type="submit" name="save_comment" value="Submit" />
-        
+                <input type="hidden"  name="id" value={{listing.id}}  />
+                <li class="list-group-item" style="width: 35rem;">
+                <button class="btn btn-outline-primary" style="width: 16rem; margin-top: 1rem; margin-bottom:1rem; margin-left: 7rem; "  type="submit" name="close" >Close listing</button>
+                </li>
             </form>
-        {% endif %}
-
-        
-
+            {% endif %}
+        </div>
 
     </div>
+
 {% endblock %}
